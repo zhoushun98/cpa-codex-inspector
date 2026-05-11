@@ -1,0 +1,23 @@
+cpa:
+  base_url: "http://127.0.0.1:38317"
+  management_key: "${CPA_MANAGEMENT_KEY}"
+
+inspect:
+  target_type: "codex"
+  workers: 4
+  delete_workers: 4
+  timeout_seconds: 15
+  retries: 0
+  used_percent_threshold: 100
+  sample_size: 0
+  user_agent: "codex_cli_rs/0.76.0 (Debian 13.0.0; x86_64) WindowsTerminal"
+
+actions:
+  delete_401: true
+  disable_quota_exhausted: true
+  enable_recovered_disabled: true
+  backup_before_delete: true
+
+output:
+  report_dir: "./reports"
+  backup_dir: "./backups"

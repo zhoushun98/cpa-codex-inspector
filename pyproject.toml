@@ -1,0 +1,28 @@
+[project]
+name = "cpa-codex-inspector"
+version = "0.1.0"
+description = "Codex auth pool inspection tool for CLIProxyAPI"
+readme = "README.md"
+authors = [
+    { name = "Jason", email = "jason007@duck.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "pyyaml>=6.0.3",
+    "rich>=15.0.0",
+]
+
+[project.scripts]
+cpa-codex-inspector = "cpa_codex_inspector.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.11.1,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.3.0",
+    "respx>=0.23.1",
+]
