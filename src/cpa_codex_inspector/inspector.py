@@ -97,7 +97,14 @@ async def inspect_account(client: CpaApiClient, account: AuthAccount, config: Ap
 
     body_text = str(result.get("body") or "")
     payload = parse_usage_payload(result.get("body"))
-    return resolve_probe_action(account, status_code, body_text, payload, config.inspect.used_percent_threshold)
+    return resolve_probe_action(
+        account,
+        status_code,
+        body_text,
+        payload,
+        config.inspect.used_percent_threshold,
+        disable_five_hour_exhausted=config.actions.disable_five_hour_exhausted,
+    )
 
 
 async def inspect_accounts(client: CpaApiClient, config: AppConfig) -> tuple[list[dict[str, Any]], list[AuthAccount], list[InspectionResult]]:
@@ -253,6 +260,13 @@ async def run_inspection(
             "used_percent_threshold": config.inspect.used_percent_threshold,
             "sample_size": config.inspect.sample_size,
             "apply": apply,
+            "actions": {
+                "delete_401": config.actions.delete_401,
+                "disable_quota_exhausted": config.actions.disable_quota_exhausted,
+                "disable_five_hour_exhausted": config.actions.disable_five_hour_exhausted,
+                "enable_recovered_disabled": config.actions.enable_recovered_disabled,
+                "backup_before_delete": config.actions.backup_before_delete,
+            },
         },
         total_files=len(files),
         probe_set_count=len([item for item in (to_auth_account(file) for file in files) if item.provider == config.inspect.target_type]),

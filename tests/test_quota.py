@@ -58,6 +58,51 @@ def test_five_hour_over_weekly_available_keeps_enabled_account() -> None:
     assert "5 小时" in result.action_reason
 
 
+def test_five_hour_over_can_disable_enabled_account() -> None:
+    result = resolve_probe_action(
+        _account(),
+        200,
+        "",
+        _usage(100, 30),
+        100,
+        disable_five_hour_exhausted=True,
+    )
+
+    assert result.action == "disable"
+    assert result.is_quota is True
+    assert "临时禁用" in result.action_reason
+
+
+def test_five_hour_over_keeps_disabled_account_when_policy_enabled() -> None:
+    result = resolve_probe_action(
+        _account(disabled=True),
+        200,
+        "",
+        _usage(100, 30),
+        100,
+        disable_five_hour_exhausted=True,
+    )
+
+    assert result.action == "keep"
+    assert result.is_quota is True
+    assert "等待短周期额度恢复" in result.action_reason
+
+
+def test_disabled_account_is_enabled_after_five_hour_recovers_when_policy_enabled() -> None:
+    result = resolve_probe_action(
+        _account(disabled=True),
+        200,
+        "",
+        _usage(20, 30),
+        100,
+        disable_five_hour_exhausted=True,
+    )
+
+    assert result.action == "enable"
+    assert result.is_quota is False
+    assert "均可用" in result.action_reason
+
+
 def test_quota_body_pattern_disables_without_rate_limit_payload() -> None:
     result = resolve_probe_action(_account(), 402, "quota exhausted", None, 100)
 

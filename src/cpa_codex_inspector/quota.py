@@ -142,6 +142,8 @@ def resolve_probe_action(
     body_text: str,
     payload: dict[str, Any] | None,
     threshold: float,
+    *,
+    disable_five_hour_exhausted: bool = False,
 ) -> InspectionResult:
     rate_limit = get_rate_limit(payload)
     used_percent = derive_used_percent(rate_limit)
@@ -166,9 +168,26 @@ def resolve_probe_action(
             if account.disabled:
                 return _decision(account, "keep", "周额度达到阈值，但账号已禁用", status_code, weekly_used, True)
             return _decision(account, "disable", "周额度达到阈值，建议禁用账号", status_code, weekly_used, True)
+        if five_hour_over and disable_five_hour_exhausted:
+            if account.disabled:
+                return _decision(
+                    account,
+                    "keep",
+                    "5 小时额度达到阈值，账号已禁用，等待短周期额度恢复",
+                    status_code,
+                    weekly_used,
+                    True,
+                )
+            return _decision(
+                account,
+                "disable",
+                "5 小时额度达到阈值，周额度仍可用，按配置建议临时禁用账号",
+                status_code,
+                weekly_used,
+                True,
+            )
         if account.disabled:
-            reason = "5 小时额度达到阈值，但周额度仍可用，建议立即启用账号" if five_hour_over else "周额度仍可用，建议立即启用账号"
-            return _decision(account, "enable", reason, status_code, weekly_used, False)
+            return _decision(account, "enable", "5 小时额度和周额度均可用，建议重新启用账号", status_code, weekly_used, False)
         if five_hour_over:
             return _decision(account, "keep", "5 小时额度达到阈值，但周额度仍可用，暂不禁用账号", status_code, weekly_used, False)
         return _decision(account, "keep", "周额度仍可用，无需处理", status_code, weekly_used, False)
@@ -182,4 +201,3 @@ def resolve_probe_action(
     if status_code == 200 and account.disabled:
         return _decision(account, "enable", "账号恢复健康，建议重新启用", status_code, used_percent, False)
     return _decision(account, "keep", "无需处理", status_code, used_percent, False)
-

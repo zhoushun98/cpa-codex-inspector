@@ -28,6 +28,7 @@ class InspectConfig:
 class ActionConfig:
     delete_401: bool = True
     disable_quota_exhausted: bool = True
+    disable_five_hour_exhausted: bool = False
     enable_recovered_disabled: bool = True
     backup_before_delete: bool = True
 
@@ -91,4 +92,3 @@ class InspectionRun:
     sampled_count: int
     results: list[InspectionResult]
     outcomes: list[ExecutionOutcome] = field(default_factory=list)
-

@@ -119,6 +119,7 @@ def load_config(path: str | Path) -> AppConfig:
         actions=ActionConfig(
             delete_401=_read_bool(actions_raw, "delete_401", True),
             disable_quota_exhausted=_read_bool(actions_raw, "disable_quota_exhausted", True),
+            disable_five_hour_exhausted=_read_bool(actions_raw, "disable_five_hour_exhausted", False),
             enable_recovered_disabled=_read_bool(actions_raw, "enable_recovered_disabled", True),
             backup_before_delete=_read_bool(actions_raw, "backup_before_delete", True),
         ),

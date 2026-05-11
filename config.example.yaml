@@ -15,6 +15,7 @@ inspect:
 actions:
   delete_401: true
   disable_quota_exhausted: true
+  disable_five_hour_exhausted: false
   enable_recovered_disabled: true
   backup_before_delete: true
 

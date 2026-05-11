@@ -18,6 +18,8 @@ cpa:
 inspect:
   used_percent_threshold: 0.9
   workers: 0
+actions:
+  disable_five_hour_exhausted: true
 output:
   report_dir: "./out"
 """,
@@ -30,6 +32,7 @@ output:
     assert config.cpa.management_key == "env-secret"
     assert config.inspect.used_percent_threshold == 90
     assert config.inspect.workers == 1
+    assert config.actions.disable_five_hour_exhausted is True
     assert config.output.report_dir == "./out"
     assert config.output.backup_dir == "./backups"
 

@@ -9,8 +9,8 @@
 - 只巡检 `provider/type = codex` 的认证文件。
 - 401 失效账号建议删除。
 - 402、quota exhausted、limit reached、payment_required 或周额度达到阈值时建议禁用。
-- 已禁用账号周额度恢复可用时建议启用。
-- 5 小时额度耗尽但周额度仍可用时默认保留。
+- 已禁用账号在短周期和周额度都恢复可用时建议启用。
+- 5 小时额度耗尽但周额度仍可用时默认保留；可配置为临时禁用。
 - 删除前默认下载认证文件备份，备份失败会跳过删除。
 - 输出终端表格和 JSON 报告，便于人工查看或 cron 归档。
 
@@ -38,6 +38,16 @@ cpa:
 ```
 
 完整配置见 [config.example.yaml](/Users/jason/cpa-codex-inspector/config.example.yaml)。
+
+如果希望 5 小时额度满时也临时禁用账号，开启：
+
+```yaml
+actions:
+  disable_five_hour_exhausted: true
+  enable_recovered_disabled: true
+```
+
+开启后，后续巡检发现该账号 5 小时额度和周额度都低于阈值，会重新建议启用。仍然需要加 `--apply` 才会真正修改账号状态。
 
 ## 使用
 
