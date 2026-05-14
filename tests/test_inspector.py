@@ -4,7 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from cpa_codex_inspector.inspector import backup_file_name, execute_actions, filter_actionable_results
+from cpa_codex_inspector.inspector import (
+    backup_file_name,
+    execute_actions,
+    filter_actionable_results,
+    inspect_accounts,
+)
 from cpa_codex_inspector.models import AppConfig, AuthAccount, CpaConfig, InspectionResult
 
 
@@ -91,3 +96,52 @@ async def test_execute_actions_backs_up_then_deletes(tmp_path: Path) -> None:
     assert outcomes[0].success is True
     assert client.deleted == [["../codex.json"]]
     assert (tmp_path / "..__codex.json").read_bytes() == b"backup:../codex.json"
+
+
+class FakeListClient:
+    def __init__(self, files: list[dict]) -> None:
+        self.files = files
+        self.api_calls: list[dict] = []
+
+    async def list_auth_files(self) -> list[dict]:
+        return self.files
+
+    async def api_call(self, **kwargs: object) -> dict:
+        self.api_calls.append(kwargs)
+        return {"status_code": 200, "body": ""}
+
+
+def _file(name: str, *, disabled: bool) -> dict:
+    return {
+        "name": name,
+        "auth_index": name.replace(".json", ""),
+        "provider": "codex",
+        "disabled": disabled,
+        "account": f"{name}@example.com",
+    }
+
+
+@pytest.mark.asyncio
+async def test_inspect_accounts_skips_disabled_when_enabled() -> None:
+    files = [_file("a.json", disabled=False), _file("b.json", disabled=True)]
+    client = FakeListClient(files)
+    config = _config()
+    config.inspect.skip_disabled = True
+
+    fetched_files, sampled, results = await inspect_accounts(client, config)  # type: ignore[arg-type]
+
+    assert {item.file_name for item in sampled} == {"a.json"}
+    assert {item.account.file_name for item in results} == {"a.json"}
+    assert len(fetched_files) == 2
+
+
+@pytest.mark.asyncio
+async def test_inspect_accounts_includes_disabled_by_default() -> None:
+    files = [_file("a.json", disabled=False), _file("b.json", disabled=True)]
+    client = FakeListClient(files)
+    config = _config()
+
+    _, sampled, results = await inspect_accounts(client, config)  # type: ignore[arg-type]
+
+    assert {item.file_name for item in sampled} == {"a.json", "b.json"}
+    assert {item.account.file_name for item in results} == {"a.json", "b.json"}

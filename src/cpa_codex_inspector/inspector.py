@@ -111,6 +111,8 @@ async def inspect_accounts(client: CpaApiClient, config: AppConfig) -> tuple[lis
     files = await client.list_auth_files()
     accounts = [to_auth_account(item) for item in files]
     probe_set = [item for item in accounts if item.provider == config.inspect.target_type]
+    if config.inspect.skip_disabled:
+        probe_set = [item for item in probe_set if not item.disabled]
     sampled = pick_sample(probe_set, config.inspect.sample_size)
 
     semaphore = asyncio.Semaphore(config.inspect.workers)
@@ -259,6 +261,7 @@ async def run_inspection(
             "retries": config.inspect.retries,
             "used_percent_threshold": config.inspect.used_percent_threshold,
             "sample_size": config.inspect.sample_size,
+            "skip_disabled": config.inspect.skip_disabled,
             "apply": apply,
             "actions": {
                 "delete_401": config.actions.delete_401,
