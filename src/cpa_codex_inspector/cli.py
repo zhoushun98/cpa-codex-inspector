@@ -9,6 +9,7 @@ from rich.console import Console
 
 from .auth import to_auth_account
 from .config import ConfigError, load_config
+from .models import AppConfig
 from .cpa_api import CpaApiClient, CpaApiError
 from .inspector import filter_actionable_results, run_inspection
 from .reporting import render_results, timestamp_slug, write_report
@@ -46,7 +47,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def apply_overrides(config_path: str, args: argparse.Namespace):
+def apply_overrides(config_path: str, args: argparse.Namespace) -> AppConfig:
     config = load_config(config_path)
     if getattr(args, "workers", None) is not None:
         config.inspect.workers = max(1, args.workers)
@@ -77,7 +78,7 @@ async def command_list(args: argparse.Namespace, console: Console) -> int:
         codex_accounts = kept
     console.print(f"Codex 账号：{len(codex_accounts)} / 总认证文件：{len(files)}")
     if skipped:
-        console.print(f"已按 skip_disabled 跳过 {skipped} 个已禁用账号")
+        console.print(f"已跳过 {skipped} 个已禁用账号（--skip-disabled）")
     for item in codex_accounts:
         state = "disabled" if item.disabled else "enabled"
         console.print(f"- {item.display_account} | {item.file_name} | {item.auth_index or '-'} | {state}")
