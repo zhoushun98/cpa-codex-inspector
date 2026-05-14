@@ -43,3 +43,39 @@ def test_load_config_requires_cpa_fields(tmp_path: Path) -> None:
 
     with pytest.raises(ConfigError, match="base_url"):
         load_config(path)
+
+
+def test_load_config_reads_skip_disabled(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CPA_MANAGEMENT_KEY", "env-secret")
+    path = tmp_path / "config.yaml"
+    path.write_text(
+        """
+cpa:
+  base_url: "http://cpa.local"
+  management_key: "${CPA_MANAGEMENT_KEY}"
+inspect:
+  skip_disabled: true
+""",
+        encoding="utf-8",
+    )
+
+    config = load_config(path)
+
+    assert config.inspect.skip_disabled is True
+
+
+def test_load_config_defaults_skip_disabled_false(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CPA_MANAGEMENT_KEY", "env-secret")
+    path = tmp_path / "config.yaml"
+    path.write_text(
+        """
+cpa:
+  base_url: "http://cpa.local"
+  management_key: "${CPA_MANAGEMENT_KEY}"
+""",
+        encoding="utf-8",
+    )
+
+    config = load_config(path)
+
+    assert config.inspect.skip_disabled is False

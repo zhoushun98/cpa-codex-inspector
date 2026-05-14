@@ -22,6 +22,7 @@ class InspectConfig:
     used_percent_threshold: float = 100.0
     sample_size: int = 0
     user_agent: str = "codex_cli_rs/0.76.0 (Debian 13.0.0; x86_64) WindowsTerminal"
+    skip_disabled: bool = False
 
 
 @dataclass(slots=True)

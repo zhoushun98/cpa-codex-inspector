@@ -115,6 +115,7 @@ def load_config(path: str | Path) -> AppConfig:
                 "user_agent",
                 "codex_cli_rs/0.76.0 (Debian 13.0.0; x86_64) WindowsTerminal",
             ),
+            skip_disabled=_read_bool(inspect_raw, "skip_disabled", False),
         ),
         actions=ActionConfig(
             delete_401=_read_bool(actions_raw, "delete_401", True),
