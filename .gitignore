@@ -16,3 +16,6 @@ config.yaml
 reports/
 backups/
 *.log
+
+# Implementation plans (process artifacts; specs are kept under version control)
+docs/superpowers/plans/
