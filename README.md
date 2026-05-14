@@ -57,7 +57,7 @@ inspect:
   skip_disabled: true
 ```
 
-开启后，这些账号不会出现在 `inspect` 与 `list` 输出里，也不会触发自动启用——如需重新启用，请手动改 yaml 关掉这个开关或直接调用 CPA Management API。
+开启后，这些账号不会出现在 `inspect` 与 `list` 输出里，也不会触发自动启用。如需重新纳入巡检，把 `skip_disabled` 改回 `false`，下一次带 `--apply` 的巡检会按现有逻辑重新判定并启用。
 
 ## 使用
 
@@ -79,7 +79,7 @@ uv run cpa-codex-inspector inspect --config config.yaml
 uv run cpa-codex-inspector inspect --config config.yaml --apply
 ```
 
-`--config` 默认为当前目录的 `config.yaml`，cron 中可省略。
+`--config` 默认为当前目录的 `config.yaml`，所以下方第 4 行示例省略了它：
 
 常用覆盖参数：
 
@@ -122,8 +122,6 @@ CPA_MANAGEMENT_KEY=CHANGE_ME
 ```cron
 */30 * * * * cd /Users/jason/cpa-codex-inspector && uv run cpa-codex-inspector inspect --config /path/to/config.yaml --apply --no-table >> /var/log/cpa-codex-inspector.log 2>&1
 ```
-
-> 由于 cron 已 `cd` 进项目根目录，也可以省略 `--config`，让程序读取当前目录下的 `config.yaml`。
 
 ## 开发验证
 
