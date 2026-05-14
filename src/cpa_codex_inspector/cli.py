@@ -9,9 +9,9 @@ from rich.console import Console
 
 from .auth import to_auth_account
 from .config import ConfigError, load_config
-from .models import AppConfig
 from .cpa_api import CpaApiClient, CpaApiError
 from .inspector import filter_actionable_results, run_inspection
+from .models import AppConfig
 from .reporting import render_results, timestamp_slug, write_report
 
 

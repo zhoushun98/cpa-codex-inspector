@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from cpa_codex_inspector.cli import apply_overrides, build_parser
 
 
